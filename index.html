@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <!-------START COUNTER----->
+  <!--counter.php-->
+    <?php
+//harviacode.com
+$filecounter=("counter.txt");
+$kunjungan=file($filecounter);
+$kunjungan[0]++;
+$file=fopen($filecounter,"w");
+fputs($file,"$kunjungan[0]");
+fclose($file);
+?>
+
+<!---MENAMPILKAN COUNTER DIINDEX--->
+<div class="counter">
+    <center>
+  </div>
+  </div>
+  <div class="counter text-center" style="background-color: white;">
+      <center><p class="lead">
+          jumlah pengunjung
+      <?php
+          include("counter.php");
+      echo "<p> $kunjungan[0] </p>"; ?>
+  </p></center>
+  <!--koneksi.php-->
+  <?php 
+$conn = mysqli_connect("localhost","root","","database");
+$result = mysqli_query($conn,"SELECT * FROM komen")
+?>
+  <!--konek.php-->
+  <?php
+include "koneksi.php";
+if (isset($_POST['kirim'])){
+    $nama = $_POST['nama'];
+$email = $_POST['email'];
+$komentar = $_POST['komentar'];
+
+echo $nama;
+
+$sql = mysqli_query($conn,"INSERT INTO komen VALUES ('','$nama','$email','$komentar',CURRENT_DATE())");
+echo "<script>alert('berhasil');window.location.href='index.php(tergantung letak komene ng ndi templatemu)';</script>";
+}
+
+
+?>
+<!---TABEL KOMEN DAN MENAMPILKAN KOMENTAR PENGUNJUNG--->
+<div class="row gx-5 justify-content-center">
+    <div class="col-lg-8 col-xl-6">
+        <form method="post" action="konek.php" id="contactForm" data-sb-form-api-token="API_TOKEN">
+            <div class="form-floating mb-3">
+                <input class="form-control" name="nama" type="text" placeholder="Enter your name..." data-sb-validations="required" />
+                <label for="nama">Full name</label>
+                <div class="invalid-feedback" data-sb-feedback="nama:required">A name is required.</div>
+            </div>
+            <div class="form-floating mb-3">
+                <input class="form-control"  name="email" type="email" placeholder="name@example.com" data-sb-validations="required,email" />
+                <label for="email">Email address</label>
+                <div class="invalid-feedback" data-sb-feedback="email:required">An email is required.</div>
+                <div class="invalid-feedback" data-sb-feedback="email:email">Email is not valid.</div>
+            </div>
+            <div class="form-floating mb-3">
+                <textarea class="form-control"  name="komentar" type="text" placeholder="Enter your message here..." style="height: 10rem" data-sb-validations="required"></textarea>
+                <label for="komentar">Message</label>
+                <div class="invalid-feedback" data-sb-feedback="komentar:required">A message is required.</div>
+            </div>
+            <div class="d-none" id="submitSuccessMessage">
+                <div class="text-center mb-3">
+                    <div class="fw-bolder">Form submission successful!</div>
+                    To activate this form, sign up at
+                    <br />
+                    <a href="https://startbootstrap.com/solution/contact-forms">https://startbootstrap.com/solution/contact-forms</a>
+                </div>
+            </div>
+            <div class="d-none" id="submitErrorMessage"><div class="text-center text-danger mb-3">Error sending message!</div></div>
+            <div class="d-grid"><button type="submit" name ="kirim" class="btn btn-success">Kirim</button></div>
+        </form>
+    </div>
+</div>
+</div>
+</div>
+</section>
+<div id="last-comment" class="container my-5">
+<h4>Semua Komentar</h4>
+<?php
+include "koneksi.php";
+$limit = 5;
+$page = isset($_GET['page']) ? $_GET['page'] : 1;
+$offset = ($page - 1) * $limit;
+if ($conn) {
+$countQuery = mysqli_query($conn, "SELECT COUNT(*) AS total FROM komen");
+$row = mysqli_fetch_assoc($countQuery);
+$totalKomentar = $row['total'];
+$totalPages = ceil($totalKomentar / $limit);
+$query = mysqli_query($conn, "SELECT * FROM komen ORDER BY id DESC LIMIT $offset, $limit");
+if ($query) {
+if (mysqli_num_rows($query) > 0) {
+while ($row = mysqli_fetch_assoc($query)) {
+$nama = $row['nama'];
+$email = $row['email'];
+$komentar = $row['komentar'];
+$tanggal = $row['tanggal'];
+
+echo "<div class='card mt-3'>";
+echo "<div class='card-body'>";
+echo "<h5 class='card-title'>$nama <small>($email)</small></h5>";
+echo "<p class='card-text'>$komentar</p>";
+echo "<p class='card-text'><small class='text-muted'>Dikirim pada $tanggal</small></p>";
+echo "</div>";
+echo "</div>";
+}
+
+} else {
+echo "<p>Belum ada komentar.</p>";
+}
+} else {
+echo "<p>Gagal menjalankan query: " . mysqli_error($conn) . "</p>";
+}
+} else {
+echo "<p>Gagal terhubung ke database.</p>";
+}
+?>
+</div>
+</div>
+</body>
+</html>
